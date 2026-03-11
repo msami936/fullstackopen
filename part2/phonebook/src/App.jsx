@@ -1,0 +1,182 @@
+import { useState, useEffect } from 'react'
+import personService from './services/persons'
+import findService from './services/find'
+import { ErrorNotification, SuccessNotification } from './components/Notification'
+import { Form } from './components/Form'
+import { AddFilter, ShowFiltered } from './components/Filter'
+
+
+const App = () => {
+
+  const [persons, setPersons] = useState([])
+  const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
+  const [newFilter, setNewFilter] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [successMessage, setSuccessMessage] = useState(null)
+  const safePersons = Array.isArray(persons) ? persons : []
+
+
+  useEffect(() => {
+    personService
+      .getAll()
+      .then(response => {
+        const data = response.data
+        setPersons(Array.isArray(data) ? data : (Array.isArray(data?.persons) ? data.persons : []))
+      })
+  }, [])
+
+
+  const reset = () => {
+    setNewName('')
+    setNewNumber('')
+  }
+
+
+  const handleNameChange = (event) => {
+    setNewName(event.target.value)
+  }
+
+  const handleNumberChange = (event) => {
+    setNewNumber(event.target.value)
+  }
+
+  const handleFilterChange = (event) => {
+    setNewFilter(event.target.value)
+  }
+
+
+  const addPerson = (event) => {
+    event.preventDefault()
+    if (findService.matchNumber(safePersons, newNumber)) {
+      alertUser()
+    } else if (findService.matchName(safePersons, newName)) {
+      changeNumber()
+    } else {
+      savePerson()
+    }
+  }
+
+  const handleDeletePerson = (personId) => {
+    const name = findService.findNameWithId(personId, safePersons)
+    if (window.confirm('Delete ' + name + ' from phonebook?')) {
+      removePerson(personId)
+    }
+  }
+
+  const alertUser = () => {
+    const numberOwner = findService.findNameWithNumber(newNumber, safePersons)
+    showErrorMessage(`No contact added, because the number ${newNumber} is already saved to phonebook for ${numberOwner}`)
+    reset()
+  }
+
+  const changeNumber = () => {
+    if (window.confirm(` ${newName} is already added to phonebook, replace the old number with a new one?`)) {
+      changePerson(findService.findIdWithName(newName, safePersons))
+    }
+  }
+
+
+  const changePerson = (id) => {
+    const person = safePersons.find(n => n.id === id)
+    const changedPerson = { ...person, number: newNumber }
+    personService
+      .update(id, changedPerson)
+      .then(response => {
+        setPersons(safePersons.map(person => person.id !== id ? person : response.data))
+        showSuccessMessage(`The number ${newNumber} is added to ${newName} `)
+      })
+      .catch(error => {
+        showErrorMessage(`Sorry, the contact ${person.name} was already deleted from server`)
+        setPersons(safePersons.filter(n => n.id !== id))
+      })
+    reset()
+  }
+
+
+
+  const savePerson = () => {
+    const personObject = {
+      name: newName,
+      number: newNumber,
+    }
+    personService
+      .create(personObject)
+      .then(response => {
+        setPersons(safePersons.concat(response.data))
+        showSuccessMessage(`The contact with name ${newName} and number ${newNumber} is added to phonebook`)
+      })
+      .catch(error => {
+        showErrorMessage('Sorry, something went wrong: ' + error.response.data.error)
+      })
+    reset()
+  }
+
+
+
+  const removePerson = (id) => {
+    const name = findService.findNameWithId(id, safePersons)
+    personService
+      .deletePerson(id)
+      .then(response => {
+        setPersons(safePersons.filter(n => n.id !== id))
+        showSuccessMessage(` ${name} is deleted from the phonebook `)
+      })
+      .catch(error => {
+        showErrorMessage('Sorry, something went wrong: ' + error.response.data.error)
+      })
+  }
+
+
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message)
+    setTimeout(() => {
+      setSuccessMessage(null)
+    }, 5000)
+  }
+
+  const showErrorMessage = (message) => {
+    setErrorMessage(message)
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 5000)
+  }
+
+
+  return (
+    <div>
+
+      <h1> Phonebook </h1>
+
+      <ErrorNotification message={errorMessage} />
+      <SuccessNotification message={successMessage} />
+
+      <AddFilter
+        filter={newFilter}
+        onChange={handleFilterChange}
+      />
+
+      <h2>add a new</h2>
+
+      <Form
+        onSubmit={addPerson}
+        valueName={newName}
+        onNameChange={handleNameChange}
+        valueNumber={newNumber}
+        onNumberChange={handleNumberChange}
+        buttonText='add'
+      />
+
+      <h2> Numbers </h2>
+
+      <ShowFiltered
+        contacts={persons}
+        filter={newFilter}
+        buttonFunction={handleDeletePerson}
+      />
+    </div>
+  )
+}
+
+export default App
+

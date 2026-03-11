@@ -1,0 +1,26 @@
+import { Input } from './Form'
+import { Person } from './Person'
+
+
+export const AddFilter = ({ filter, onChange }) => (
+  <>
+    <Input
+      text='filter shown with'
+      value={filter}
+      onChange={onChange} />
+  </>
+)
+
+export const ShowFiltered = (props) => (
+  <ul>
+    {(Array.isArray(props.contacts) ? props.contacts : [])
+      .filter(person =>
+        (person.name.toLowerCase()).includes((props.filter).toLowerCase()) || (person.number).includes(props.filter))
+      .map(person => {
+        return Person(person, props)
+      }
+      )}
+  </ul>
+)
+
+
