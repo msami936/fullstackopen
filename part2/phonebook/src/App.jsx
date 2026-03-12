@@ -14,15 +14,13 @@ const App = () => {
   const [newFilter, setNewFilter] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
-  const safePersons = Array.isArray(persons) ? persons : []
 
 
   useEffect(() => {
     personService
       .getAll()
       .then(response => {
-        const data = response.data
-        setPersons(Array.isArray(data) ? data : (Array.isArray(data?.persons) ? data.persons : []))
+        setPersons(response.data)
       })
   }, [])
 
@@ -48,9 +46,9 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-    if (findService.matchNumber(safePersons, newNumber)) {
+    if (findService.matchNumber(persons, newNumber)) {
       alertUser()
-    } else if (findService.matchName(safePersons, newName)) {
+    } else if (findService.matchName(persons, newName)) {
       changeNumber()
     } else {
       savePerson()
@@ -58,37 +56,37 @@ const App = () => {
   }
 
   const handleDeletePerson = (personId) => {
-    const name = findService.findNameWithId(personId, safePersons)
+    const name = findService.findNameWithId(personId, persons)
     if (window.confirm('Delete ' + name + ' from phonebook?')) {
       removePerson(personId)
     }
   }
 
   const alertUser = () => {
-    const numberOwner = findService.findNameWithNumber(newNumber, safePersons)
+    const numberOwner = findService.findNameWithNumber(newNumber, persons)
     showErrorMessage(`No contact added, because the number ${newNumber} is already saved to phonebook for ${numberOwner}`)
     reset()
   }
 
   const changeNumber = () => {
     if (window.confirm(` ${newName} is already added to phonebook, replace the old number with a new one?`)) {
-      changePerson(findService.findIdWithName(newName, safePersons))
+      changePerson(findService.findIdWithName(newName, persons))
     }
   }
 
 
   const changePerson = (id) => {
-    const person = safePersons.find(n => n.id === id)
+    const person = persons.find(n => n.id === id)
     const changedPerson = { ...person, number: newNumber }
     personService
       .update(id, changedPerson)
       .then(response => {
-        setPersons(safePersons.map(person => person.id !== id ? person : response.data))
+        setPersons(persons.map(person => person.id !== id ? person : response.data))
         showSuccessMessage(`The number ${newNumber} is added to ${newName} `)
       })
       .catch(error => {
         showErrorMessage(`Sorry, the contact ${person.name} was already deleted from server`)
-        setPersons(safePersons.filter(n => n.id !== id))
+        setPersons(persons.filter(n => n.id !== id))
       })
     reset()
   }
@@ -103,7 +101,7 @@ const App = () => {
     personService
       .create(personObject)
       .then(response => {
-        setPersons(safePersons.concat(response.data))
+        setPersons(persons.concat(response.data))
         showSuccessMessage(`The contact with name ${newName} and number ${newNumber} is added to phonebook`)
       })
       .catch(error => {
@@ -115,11 +113,11 @@ const App = () => {
 
 
   const removePerson = (id) => {
-    const name = findService.findNameWithId(id, safePersons)
+    const name = findService.findNameWithId(id, persons)
     personService
       .deletePerson(id)
       .then(response => {
-        setPersons(safePersons.filter(n => n.id !== id))
+        setPersons(persons.filter(n => n.id !== id))
         showSuccessMessage(` ${name} is deleted from the phonebook `)
       })
       .catch(error => {
@@ -179,4 +177,3 @@ const App = () => {
 }
 
 export default App
-

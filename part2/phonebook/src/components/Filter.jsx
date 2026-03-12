@@ -13,7 +13,7 @@ export const AddFilter = ({ filter, onChange }) => (
 
 export const ShowFiltered = (props) => (
   <ul>
-    {(Array.isArray(props.contacts) ? props.contacts : [])
+    {props.contacts
       .filter(person =>
         (person.name.toLowerCase()).includes((props.filter).toLowerCase()) || (person.number).includes(props.filter))
       .map(person => {
@@ -22,5 +22,3 @@ export const ShowFiltered = (props) => (
       )}
   </ul>
 )
-
-
