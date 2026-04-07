@@ -85,8 +85,12 @@ const App = () => {
         showSuccessMessage(`The number ${newNumber} is added to ${newName} `)
       })
       .catch(error => {
-        showErrorMessage(`Sorry, the contact ${person.name} was already deleted from server`)
-        setPersons(persons.filter(n => n.id !== id))
+        if (error.response.data && error.response.data.error) {
+          showErrorMessage(error.response.data.error)
+        } else {
+          showErrorMessage(`Sorry, the contact ${person.name} was already deleted from server`)
+          setPersons(persons.filter(n => n.id !== id))
+        }
       })
     reset()
   }
