@@ -4,7 +4,7 @@ Full Stack Open - Part 3: Phonebook Backend
 
 ## Live Application
 
-[Link to application](https://fullstackopen-part3-vy53.onrender.com)
+Link to application: (https://fullstackopen-part3-vy53.onrender.com)
 
 ## API Endpoints
 
