@@ -11,7 +11,7 @@
     "test": "npm run test:node && npm run test:jest",
     "test:node": "node --test tests/dummy.test.js tests/total-likes.test.js tests/favourite-blog.test.js tests/most-blogs.test.js tests/most-likes.test.js",
     "test:jest": "cross-env NODE_ENV=test jest --verbose --runInBand tests/blog-api.test.js tests/average.test.js tests/reverse.test.js",
-    "start:test": "NODE_ENV=test node index.js"
+    "start:test": "cross-env NODE_ENV=test node index.js"
   },
   "author": "",
   "license": "ISC",
