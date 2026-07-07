@@ -13,7 +13,23 @@ export const newDiaryParser = (req: Request, _res: Response, next: NextFunction)
 
 export const errorMiddleware = (error: unknown, _req: Request, res: Response, next: NextFunction) => {
   if (error instanceof z.ZodError) {
-    res.status(400).send({ error: error.issues });
+    const first = error.issues[0];
+
+    if (first.code === 'invalid_value') {
+      const field = first.path[0];
+
+      if (field === 'visibility') {
+        res.status(400).send({ error: `Incorrect visibility: ${String(first.input)}` });
+        return;
+      }
+
+      if (field === 'weather') {
+        res.status(400).send({ error: `Incorrect weather: ${String(first.input)}` });
+        return;
+      }
+    }
+
+    res.status(400).send({ error: first.message });
   } else {
     next(error);
   }

@@ -1,10 +1,10 @@
 import { v1 as uuid } from 'uuid';
 import patientData from '../../data/patients.ts';
-import type { NewPatient, Patient, PublicPatient } from '../types.ts';
+import type { Entry, NewEntry, NewPatient, NonSensitivePatient, Patient } from '../types.ts';
 
-const patients: Patient[] = patientData;
+const patients: Patient[] = structuredClone(patientData);
 
-const getPublicPatients = (): PublicPatient[] => {
+const getNonSensitivePatients = (): NonSensitivePatient[] => {
   return patients.map(({ id, name, dateOfBirth, gender, occupation }) => ({
     id,
     name,
@@ -14,9 +14,15 @@ const getPublicPatients = (): PublicPatient[] => {
   }));
 };
 
+const findById = (id: string): Patient | undefined => {
+  const patient = patients.find((p) => p.id === id);
+  return patient;
+};
+
 const addPatient = (newPatient: NewPatient): Patient => {
   const patient: Patient = {
     id: uuid(),
+    entries: [],
     ...newPatient,
   };
 
@@ -24,7 +30,25 @@ const addPatient = (newPatient: NewPatient): Patient => {
   return patient;
 };
 
+const addEntry = (patientId: string, entry: NewEntry): Entry | undefined => {
+  const patient = patients.find((p) => p.id === patientId);
+
+  if (!patient) {
+    return undefined;
+  }
+
+  const newEntry: Entry = {
+    ...entry,
+    id: uuid(),
+  };
+
+  patient.entries.push(newEntry);
+  return newEntry;
+};
+
 export default {
-  getPublicPatients,
+  getNonSensitivePatients,
+  findById,
   addPatient,
+  addEntry,
 };

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "E2E tests for patientor",
   "scripts": {
+    "pretest": "node ./scripts/kill-backend-port.cjs",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",

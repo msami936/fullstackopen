@@ -12,6 +12,22 @@ export default defineConfig({
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
   },
+  webServer: [
+    {
+      command: 'npm start',
+      cwd: '../patientor/backend',
+      url: 'http://localhost:3001/api/ping',
+      reuseExistingServer: !!process.env.CI,
+      timeout: 120_000,
+    },
+    {
+      command: 'npm run dev -- --port 5173',
+      cwd: '../patientor/frontend',
+      url: 'http://localhost:5173',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+  ],
   projects: [
     {
       name: 'chromium',
