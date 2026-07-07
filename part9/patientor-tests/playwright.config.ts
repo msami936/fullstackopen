@@ -17,14 +17,16 @@ export default defineConfig({
       command: 'npm start',
       cwd: '../patientor/backend',
       url: 'http://localhost:3001/api/ping',
-      reuseExistingServer: !!process.env.CI,
+      reuseExistingServer: true,
       timeout: 120_000,
     },
     {
-      command: 'npm run dev -- --port 5173',
+      command: process.env.CI
+        ? 'npx vite preview --port 5173'
+        : 'npm run dev -- --port 5173',
       cwd: '../patientor/frontend',
       url: 'http://localhost:5173',
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: true,
       timeout: 120_000,
     },
   ],

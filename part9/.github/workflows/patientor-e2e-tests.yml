@@ -21,10 +21,6 @@ jobs:
       working-directory: ./patientor/backend
       run: npm install --legacy-peer-deps
 
-    - name: Start patientor backend
-      working-directory: ./patientor/backend
-      run: npm start &
-
     - name: Install patientor frontend dependencies
       working-directory: ./patientor/frontend
       run: npm install --legacy-peer-deps
@@ -33,20 +29,13 @@ jobs:
       working-directory: ./patientor/frontend
       run: npm run build
 
-    - name: Start patientor frontend preview
-      working-directory: ./patientor/frontend
-      run: npx vite preview --port 5173 &
-
     - name: Install e2e test dependencies
       working-directory: ./patientor-tests
-      run: npm install 
+      run: npm install
 
     - name: Install Playwright browsers
       working-directory: ./patientor-tests
       run: npx playwright install --with-deps chromium
-
-    - name: Wait for servers to start
-      run: npx wait-on http://localhost:3001/api/ping http://localhost:5173 --timeout 60000
 
     - name: Run E2E tests
       working-directory: ./patientor-tests
