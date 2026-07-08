@@ -31,3 +31,5 @@ flyctl deploy
 Fly.io polls `/health` to verify deployments. The pipeline also checks the endpoint after deploy.
 
 The app configuration is in `fly.toml` and `Dockerfile`.
+
+Test PR change for branch protection verification.
