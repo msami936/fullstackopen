@@ -1,8 +1,8 @@
 name: Health app E2E Tests
 
 on:
-  push:
-    branches: [ dev, main, master ]
+  # push:
+  #   branches: [ dev, main, master ]
 
 jobs:
   test:
