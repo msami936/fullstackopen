@@ -19,12 +19,15 @@ Start by running `npm install` inside the project folder
 
 ## Deployment
 
+The app exposes a health check at `/health` and is deployed automatically when the GitHub Actions pipeline passes.
+
 From the `part11` directory:
 
 ```bash
-fly auth login
-fly launch --no-deploy
-fly deploy
+flyctl auth login
+flyctl deploy
 ```
+
+Fly.io polls `/health` to verify deployments. The pipeline also checks the endpoint after deploy.
 
 The app configuration is in `fly.toml` and `Dockerfile`.

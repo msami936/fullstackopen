@@ -32,3 +32,5 @@ jobs:
         run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - name: Verify deployment health
+        run: curl --fail https://msami936-fullstackopen-part11.fly.dev/health
