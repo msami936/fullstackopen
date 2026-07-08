@@ -8,11 +8,13 @@ import PokemonList from '../src/PokemonList'
 const pokemonList = [{
   url: 'https://pokeapi.co/api/v2/pokemon/1/',
   name: 'bulbasaur',
-  id: 1
+  id: 1,
+  type: 'grass'
 }, {
   url: 'https://pokeapi.co/api/v2/pokemon/133/',
   name: 'eevee',
-  id: 133
+  id: 133,
+  type: 'normal'
 }]
 
 describe('<PokemonList />', () => {
@@ -24,5 +26,7 @@ describe('<PokemonList />', () => {
     )
     expect(screen.getByText('bulbasaur')).toBeVisible()
     expect(screen.getByText('eevee')).toBeVisible()
+    expect(screen.getByText('bulbasaur').closest('a')).toHaveClass('pokemon-type-grass')
+    expect(screen.getByText('eevee').closest('a')).toHaveClass('pokemon-type-normal')
   })
 })
