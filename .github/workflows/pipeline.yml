@@ -55,3 +55,39 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [simple_deployment_pipeline, tag_release]
+    if: always()
+    steps:
+      - name: Notify on deployment success
+        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' '), '#skip') && needs.simple_deployment_pipeline.result == 'success' && needs.tag_release.result == 'success' }}
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: success
+          nodetail: true
+          content: '✅ **Deployment Successful!** A new version deployed to production'
+          title: Deployment Details
+          description: |
+            Commit: [`${{ github.sha }}`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+            Message: ${{ github.event.head_commit.message }}
+            Author: ${{ github.event.head_commit.author.name }}
+      - name: Notify on failure
+        if: ${{ needs.simple_deployment_pipeline.result == 'failure' || needs.tag_release.result == 'failure' }}
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: failure
+          content: '❌ **Build Failed!** The pipeline encountered an error'
+          title: Failure Details
+          description: |
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Commit: [`${{ github.sha }}`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+            Message: ${{ github.event.head_commit.message }}
+            Author: ${{ github.event.head_commit.author.name }}
+            Workflow: ${{ github.workflow }}
+            Job: ${{ needs.simple_deployment_pipeline.result == 'failure' && 'simple_deployment_pipeline' || 'tag_release' }}
+            [View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
