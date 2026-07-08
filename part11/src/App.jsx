@@ -1,16 +1,28 @@
 import React from 'react'
 import { Routes, Route, useMatch } from 'react-router-dom'
+import axios from 'axios'
 import { useApi } from './useApi'
 import LoadingSpinner from './LoadingSpinner'
 import ErrorMessage from './ErrorMessage'
 import PokemonPage from './PokemonPage'
 import PokemonList from './PokemonList'
 
-const mapResults = (({ results }) => results.map(({ url, name }) => ({
-  url,
-  name,
-  id: parseInt(url.match(/\/(\d+)\//)[1])
-})))
+const mapResults = async ({ results }) => {
+  const pokemonList = await Promise.all(
+    results.map(async ({ url, name }) => {
+      const { data } = await axios.get(url)
+      const { type } = data.types.find(({ slot }) => slot === 1)
+      return {
+        url,
+        name,
+        id: parseInt(url.match(/\/(\d+)\//)[1]),
+        type: type.name
+      }
+    })
+  )
+
+  return pokemonList
+}
 
 const App = () => {
   const match = useMatch('/pokemon/:name')

@@ -44,7 +44,7 @@ footer {
 .list-item {
   background-position: center;
   background-repeat: no-repeat;
-  background-color: #eee;
+  background-color: var(--pokemon-type-color, #eee);
   margin: 10px;
   height: 150px;
   width: 150px;
@@ -58,7 +58,7 @@ footer {
   width: 100%;
   text-align: center;
   text-transform: capitalize;
-  background-color: #eee;
+  background-color: rgba(255, 255, 255, 0.65);
 }
 
 .links {
