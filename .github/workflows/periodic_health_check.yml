@@ -1,0 +1,30 @@
+name: Periodic health check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
+
+jobs:
+  health_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the deployed service URL
+        uses: jtalk/url-health-check-action@v5
+        with:
+          url: https://msami936-fullstackopen-part11.fly.dev/health
+          max-attempts: 3
+          retry-delay: 5s
+      - name: Notify on health check failure
+        if: failure()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: failure
+          nodetail: true
+          content: '❌ **Health Check Failed!** Your application is not responding correctly.'
+          title: Health Check Details
+          description: |
+            `*/15 * * * *`
+            URL: https://msami936-fullstackopen-part11.fly.dev/health
+            Please investigate immediately!

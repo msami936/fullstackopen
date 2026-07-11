@@ -6,6 +6,10 @@ This repository is used for the CI/CD module of the Full Stack Open course
 
 Link to application: https://msami936-fullstackopen-part11.fly.dev
 
+## My own pipeline repository
+
+Link to repository: https://github.com/msami936/part11_exercise21
+
 ## Commands
 
 Start by running `npm install` inside the project folder
